@@ -8,14 +8,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "3.jpeg",
+      "src": "4.png",
       "sizes": "512x512",
-      "type": "image/jpeg/png"
+      "type": "image/png"
     },
     {
       "src": "4.png",
       "sizes": "512x512",
-      "type": "image/jpeg/png"
+      "type": "image/png"
     }
   ]
 }
