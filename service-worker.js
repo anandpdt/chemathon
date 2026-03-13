@@ -21,3 +21,18 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+self.addEventListener("push", function(event) {
+
+  const data = event.data.json();
+
+  const options = {
+    body: data.body,
+    icon: "/4.png",
+    badge: "/4.png"
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+
+});
