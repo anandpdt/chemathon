@@ -59,31 +59,52 @@
 <body class="antialiased min-h-screen flex overflow-hidden">
 
   <!-- EMERGENCY EVACUATION MODAL -->
-  <div id="evac-modal" class="hidden fixed inset-0 z-[100] bg-rose-900/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-white text-center">
+  <div id="evac-modal" class="hidden fixed inset-0 z-[100] bg-rose-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-white text-center">
     <div class="animate-bounce mb-6">
-      <i data-lucide="triangle-alert" class="w-24 h-24 text-rose-400"></i>
+      <i data-lucide="triangle-alert" class="w-16 h-16 sm:w-24 sm:h-24 text-rose-400"></i>
     </div>
-    <h1 class="text-5xl md:text-6xl font-extrabold mb-4 uppercase tracking-widest text-rose-100 drop-shadow-lg">EVACUATE NOW</h1>
-    <p class="text-xl md:text-2xl mb-10 max-w-3xl text-rose-200 font-light">
+    <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 uppercase tracking-widest text-rose-100 drop-shadow-lg">EVACUATE NOW</h1>
+    <p class="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-10 max-w-3xl text-rose-200 font-light px-2">
       Critical flood conditions detected in your immediate vicinity. An automated evacuation route to the nearest safe zone has been generated.
     </p>
-    <div class="flex flex-col sm:flex-row gap-6">
-      <button onclick="dismissEvacuation()" class="px-8 py-4 bg-white text-rose-900 font-bold rounded-xl hover:bg-rose-100 transition shadow-2xl text-lg flex items-center">
-        <i data-lucide="map-pinned" class="w-6 h-6 mr-3"></i> View Safe Route
+    <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto px-4 sm:px-0">
+      <button onclick="dismissEvacuation()" class="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-rose-900 font-bold rounded-xl hover:bg-rose-100 transition shadow-2xl text-base sm:text-lg flex justify-center items-center">
+        <i data-lucide="map-pinned" class="w-5 h-5 sm:w-6 sm:h-6 mr-3"></i> View Safe Route
       </button>
-      <button class="px-8 py-4 bg-transparent border-2 border-rose-400 text-white font-bold rounded-xl hover:bg-rose-800 transition shadow-2xl text-lg flex items-center">
-        <i data-lucide="phone-call" class="w-6 h-6 mr-3"></i> Dial Emergency (112)
+      <button class="w-full sm:w-auto px-6 sm:px-8 py-4 bg-transparent border-2 border-rose-400 text-white font-bold rounded-xl hover:bg-rose-800 transition shadow-2xl text-base sm:text-lg flex justify-center items-center">
+        <i data-lucide="phone-call" class="w-5 h-5 sm:w-6 sm:h-6 mr-3"></i> Dial Emergency (112)
       </button>
     </div>
   </div>
 
+  <!-- Mobile Overlay -->
+  <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/60 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0" onclick="toggleSidebar()"></div>
+
   <!-- SIDEBAR NAVIGATION -->
-  <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col h-screen fixed left-0 top-0 z-40 shadow-xl">
-    <div class="p-6 border-b border-slate-700/50 flex items-center space-x-3">
-      <div class="p-2 bg-blue-500/20 rounded-lg"><i data-lucide="waves" class="w-6 h-6 text-blue-400"></i></div>
-      <div>
-        <h1 class="text-lg font-bold text-white tracking-tight">FloodSense <span class="text-blue-400">Pro</span></h1>
-        <p class="text-[10px] uppercase tracking-widest text-slate-400">Civilian Safety</p>
+  <aside id="sidebar" class="w-64 bg-slate-900 text-slate-300 flex flex-col h-screen fixed left-0 top-0 z-50 shadow-xl transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+    <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-blue-500/20 rounded-lg"><i data-lucide="waves" class="w-6 h-6 text-blue-400"></i></div>
+        <div>
+          <h1 class="text-lg font-bold text-white tracking-tight">FloodSense <span class="text-blue-400">Pro</span></h1>
+          <p class="text-[10px] uppercase tracking-widest text-slate-400">Civilian Safety</p>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Context Selector (Inside Sidebar to save space on mobile header) -->
+    <div class="lg:hidden px-4 py-4 border-b border-slate-700/50 bg-slate-800/30">
+      <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 block">Monitoring Target</label>
+      <div class="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-700 w-full transition-colors">
+        <i data-lucide="target" class="w-4 h-4 text-blue-400 ml-2"></i>
+        <select id="monitoring-context-mobile" onchange="changeContext(this.value)" class="bg-transparent text-sm text-slate-200 font-medium border-none focus:ring-0 cursor-pointer py-1.5 px-2 outline-none w-full">
+          <option value="river">Ganges River Basin</option>
+          <option value="dam">Farakka Barrage (Dam)</option>
+          <option value="urban">Patna City Drainage</option>
+        </select>
       </div>
     </div>
 
@@ -117,64 +138,77 @@
   </aside>
 
   <!-- MAIN CONTENT WRAPPER -->
-  <div class="ml-64 flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+  <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 lg:ml-64 w-full">
     
     <!-- TOP HEADER -->
     <header class="bg-white border-b border-slate-200 shadow-sm z-30 flex-shrink-0">
-      <div class="px-6 py-4 flex justify-between items-center">
+      <div class="px-4 sm:px-6 py-3 flex justify-between items-center">
         
-        <!-- Context Selector -->
-        <div class="flex items-center space-x-2">
-          <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:block">Monitoring Target:</label>
-          <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
-            <i data-lucide="target" class="w-4 h-4 text-slate-500 ml-2"></i>
-            <select id="monitoring-context" onchange="changeContext()" class="bg-transparent text-sm text-slate-700 font-medium border-none focus:ring-0 cursor-pointer py-1 px-2 outline-none w-48">
-              <option value="river">Ganges River Basin</option>
-              <option value="dam">Farakka Barrage (Dam)</option>
-              <option value="urban">Patna City Drainage</option>
-            </select>
+        <!-- Left Side: Hamburger & Branding -->
+        <div class="flex items-center">
+          <button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+          
+          <!-- Mobile Branding -->
+          <div class="lg:hidden flex items-center mr-2">
+            <i data-lucide="waves" class="w-5 h-5 text-blue-600 mr-2"></i>
+            <span class="font-bold text-slate-800 text-lg">FloodSense</span>
+          </div>
+
+          <!-- Desktop Context Selector -->
+          <div class="hidden lg:flex items-center space-x-4">
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Monitoring Target:</label>
+            <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 transition-colors hover:bg-slate-200">
+              <i data-lucide="target" class="w-4 h-4 text-slate-500 ml-2"></i>
+              <select id="monitoring-context-desktop" onchange="changeContext(this.value)" class="bg-transparent text-sm text-slate-700 font-bold border-none focus:ring-0 cursor-pointer py-1 px-2 outline-none w-48">
+                <option value="river">Ganges River Basin</option>
+                <option value="dam">Farakka Barrage (Dam)</option>
+                <option value="urban">Patna City Drainage</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <!-- Status & Tools -->
-        <div class="flex items-center space-x-6">
-          <div class="flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200" id="status-badge-container">
-            <span class="relative flex h-3 w-3">
+        <!-- Right Side: Status & Tools -->
+        <div class="flex items-center space-x-3 sm:space-x-6">
+          <div class="flex items-center space-x-1.5 sm:space-x-2 bg-emerald-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-200" id="status-badge-container">
+            <span class="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" id="status-dot"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500" id="status-dot"></span>
             </span>
-            <span class="text-sm font-semibold text-emerald-700" id="user-status-text">System Nominal</span>
+            <span class="text-[10px] sm:text-sm font-bold text-emerald-700 uppercase tracking-wide" id="user-status-text">Nominal</span>
           </div>
           <div class="hidden md:flex flex-col items-end">
-            <span id="tx-status" class="text-xs font-semibold text-blue-600 flex items-center"><i data-lucide="wifi" class="w-3 h-3 mr-1"></i> Live Sync</span>
-            <span id="clock" class="text-xs text-slate-400">--:--:--</span>
+            <span id="tx-status" class="text-xs font-bold text-blue-600 flex items-center"><i data-lucide="wifi" class="w-3 h-3 mr-1"></i> Live Sync</span>
+            <span id="clock" class="text-[10px] text-slate-400 font-medium tracking-widest">--:--:--</span>
           </div>
-          <button class="relative p-2 text-slate-400 hover:text-blue-600 transition-colors bg-slate-100 rounded-full">
+          <button class="relative p-2 text-slate-500 hover:text-blue-600 transition-colors bg-slate-100 hover:bg-blue-50 rounded-full">
             <i data-lucide="bell" class="w-5 h-5"></i>
-            <span id="alert-badge" class="absolute top-0 right-0 h-3 w-3 hidden bg-rose-500 border-2 border-white rounded-full"></span>
+            <span id="alert-badge" class="absolute top-0 right-0 h-2.5 w-2.5 sm:h-3 sm:w-3 hidden bg-rose-500 border-2 border-white rounded-full"></span>
           </button>
         </div>
       </div>
     </header>
 
     <!-- SCROLLABLE CONTENT -->
-    <main class="flex-1 overflow-y-auto p-6 lg:p-8 scroll-smooth" id="scroll-area">
-      <div class="max-w-7xl mx-auto space-y-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 scroll-smooth" id="scroll-area">
+      <div class="max-w-7xl mx-auto space-y-6 lg:space-y-8">
 
         <!-- ALERTS TICKER (Only shows on warning) -->
-        <div id="alert-ticker" class="hidden bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg shadow-sm flex justify-between items-center">
-          <div class="flex items-center">
-            <i data-lucide="alert-circle" class="w-6 h-6 text-rose-500 mr-3 animate-pulse"></i>
+        <div id="alert-ticker" class="hidden bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div class="flex items-start sm:items-center">
+            <i data-lucide="alert-circle" class="w-6 h-6 text-rose-500 mr-3 animate-pulse flex-shrink-0"></i>
             <div>
               <h3 class="text-rose-800 font-bold text-sm">ACTIVE WEATHER ADVISORY</h3>
               <p class="text-rose-600 text-xs mt-0.5">Heavy rainfall detected upstream. River levels rising faster than nominal rates. Stay alert.</p>
             </div>
           </div>
-          <button onclick="forceShowRoute()" class="text-xs font-bold bg-rose-600 text-white px-3 py-1.5 rounded shadow hover:bg-rose-700 transition">Show Safe Zones</button>
+          <button onclick="forceShowRoute()" class="text-xs font-bold bg-rose-600 text-white px-3 py-1.5 rounded shadow hover:bg-rose-700 transition self-end sm:self-auto whitespace-nowrap">Show Safe Zones</button>
         </div>
 
         <!-- SECTION 1: KEY METRICS -->
-        <section id="overview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <!-- Risk Gauge -->
           <div class="card p-5 flex flex-col justify-center items-center relative overflow-hidden bg-slate-800">
             <div class="absolute inset-0 opacity-10 pointer-events-none"><i data-lucide="shield-alert" class="w-full h-full text-white"></i></div>
@@ -227,35 +261,35 @@
         </section>
 
         <!-- SECTION 2: MAP & SAFETY MEASURES -->
-        <section id="evacuation" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section id="evacuation" class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           
           <!-- Evacuation Map -->
           <div class="card lg:col-span-2 flex flex-col overflow-hidden relative border-slate-200">
-            <div id="map-overlay-warning" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 w-11/12 z-[400] bg-rose-600 text-white p-4 rounded-xl shadow-2xl border-2 border-rose-400 flex justify-between items-center">
+            <div id="map-overlay-warning" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 w-11/12 z-[400] bg-rose-600 text-white p-3 sm:p-4 rounded-xl shadow-2xl border-2 border-rose-400 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
               <div class="flex items-center">
-                <i data-lucide="alert-triangle" class="w-8 h-8 mr-4 animate-pulse"></i>
+                <i data-lucide="alert-triangle" class="w-6 h-6 sm:w-8 sm:h-8 mr-3 sm:mr-4 animate-pulse flex-shrink-0"></i>
                 <div>
-                  <p class="font-extrabold text-base tracking-wide">EVACUATION ROUTE ACTIVE</p>
-                  <p class="text-sm text-rose-100 font-medium mt-1">Follow the dashed blue path to the designated Relief Camp.</p>
+                  <p class="font-extrabold text-sm sm:text-base tracking-wide">EVACUATION ROUTE ACTIVE</p>
+                  <p class="text-xs sm:text-sm text-rose-100 font-medium mt-0.5 sm:mt-1">Follow the dashed blue path to the designated Relief Camp.</p>
                 </div>
               </div>
-              <button onclick="hideRouteWarning()" class="bg-rose-800 p-2 rounded-lg hover:bg-rose-900 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+              <button onclick="hideRouteWarning()" class="bg-rose-800 p-1.5 sm:p-2 rounded-lg hover:bg-rose-900 transition self-end sm:self-auto"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
             </div>
 
             <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-white z-10">
               <h3 class="text-sm font-bold text-slate-700 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-blue-600"></i> Live Hazard & Routing Map</h3>
               <span id="map-target-label" class="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Zone: River Basin</span>
             </div>
-            <div class="flex-grow w-full relative" style="min-height: 450px;">
+            <div class="flex-grow w-full relative min-h-[350px] md:min-h-[450px]">
               <div id="map" class="absolute inset-0"></div>
             </div>
           </div>
 
           <!-- Safety Actions Panel -->
-          <div id="safety" class="flex flex-col gap-6">
+          <div id="safety" class="flex flex-col gap-4 lg:gap-6">
             
             <!-- Quick Actions -->
-            <div class="card p-6 border-slate-200 bg-white">
+            <div class="card p-5 sm:p-6 border-slate-200 bg-white">
               <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-2">
                 <i data-lucide="navigation" class="w-4 h-4 mr-2 text-blue-600"></i> Action Center
               </h3>
@@ -273,7 +307,7 @@
             </div>
 
             <!-- Emergency Contacts -->
-            <div class="card p-6 border-slate-200 bg-rose-50 border-rose-100">
+            <div class="card p-5 sm:p-6 border-slate-200 bg-rose-50 border-rose-100">
                <h3 class="text-sm font-bold text-rose-800 mb-4 flex items-center border-b border-rose-200 pb-2">
                 <i data-lucide="phone" class="w-4 h-4 mr-2"></i> Emergency Contacts
               </h3>
@@ -294,7 +328,7 @@
             </div>
 
             <!-- Preparedness Checklist -->
-            <div class="card p-6 border-slate-200 bg-white flex-1">
+            <div class="card p-5 sm:p-6 border-slate-200 bg-white flex-1">
               <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-2">
                 <i data-lucide="list-checks" class="w-4 h-4 mr-2 text-amber-500"></i> Preparedness Checklist
               </h3>
@@ -310,15 +344,15 @@
         </section>
 
         <!-- SECTION 3: COMPREHENSIVE ANALYTICS (RESTORED GRAPHS) -->
-        <section id="analytics" class="card p-6 border-slate-200">
+        <section id="analytics" class="card p-5 sm:p-6 border-slate-200">
           <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-3">
-            <h3 class="text-base font-bold text-slate-800 flex items-center">
+            <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center">
               <i data-lucide="activity" class="w-5 h-5 mr-2 text-blue-600"></i> Detailed Environmental Analytics
             </h3>
-            <span class="text-xs font-medium bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Real-time Telemetry (Past 60s)</span>
+            <span class="hidden sm:inline-block text-xs font-medium bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Real-time Telemetry (Past 60s)</span>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             <!-- Graph 1: Water Level -->
             <div>
               <h4 class="text-xs font-bold text-center text-slate-500 uppercase mb-3">Water Level Surge (cm)</h4>
@@ -343,17 +377,17 @@
         </section>
 
         <!-- SECTION 4: SIMULATION CONTROLS -->
-        <section id="simulation" class="card p-6 border-slate-200 bg-slate-800 text-white">
+        <section id="simulation" class="card p-5 sm:p-6 border-slate-200 bg-slate-800 text-white">
           <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-3">
             <div>
-              <h3 class="text-base font-bold text-white flex items-center">
+              <h3 class="text-sm sm:text-base font-bold text-white flex items-center">
                 <i data-lucide="server-cog" class="w-5 h-5 mr-2 text-blue-400"></i> System Testing & Simulation
               </h3>
               <p class="text-xs text-slate-400 mt-1">Developers: Inject artificial data to verify routing and warning systems.</p>
             </div>
           </div>
           
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <button onclick="simRainfall()" class="py-3 px-4 rounded-xl border border-indigo-500 text-sm font-bold text-white bg-indigo-600/20 hover:bg-indigo-600 transition flex items-center justify-center">
               <i data-lucide="cloud-rain" class="w-4 h-4 mr-2"></i> Trigger Heavy Rain
             </button>
@@ -367,7 +401,7 @@
         </section>
 
         <!-- FOOTER -->
-        <footer class="text-center py-6 text-xs text-slate-400 mt-8">
+        <footer class="text-center py-6 text-xs text-slate-400 mt-4 sm:mt-8">
           &copy; <script>document.write(new Date().getFullYear())</script> FloodSense Pro System. Advanced Civilian Protection Dashboard.
         </footer>
 
@@ -390,6 +424,29 @@
     window.dismissEvacuation = dismissEvacuation;
     window.forceShowRoute = forceShowRoute;
     window.hideRouteWarning = hideRouteWarning;
+    window.toggleSidebar = toggleSidebar;
+
+    // --- SIDEBAR TOGGLE ---
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      if(sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
+    }
+
+    // Close sidebar on mobile link click
+    document.querySelectorAll('#sidebar nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        if(window.innerWidth < 1024) toggleSidebar();
+      });
+    });
 
     // --- FIREBASE SETUP ---
     const customFirebaseConfig = {
@@ -477,9 +534,13 @@
     }
 
     // --- CONTEXT SWITCHER ---
-    function changeContext() {
-      const ctx = document.getElementById('monitoring-context').value;
+    function changeContext(value) {
+      const ctx = value || document.getElementById('monitoring-context-desktop').value;
       const label = document.getElementById('map-target-label');
+      
+      // Sync both dropdowns if changed
+      if(document.getElementById('monitoring-context-desktop')) document.getElementById('monitoring-context-desktop').value = ctx;
+      if(document.getElementById('monitoring-context-mobile')) document.getElementById('monitoring-context-mobile').value = ctx;
       
       if(ctx === 'river') {
         WL_CRIT = 250; label.innerText = "Zone: River Basin";
@@ -496,6 +557,9 @@
         markerDanger.setLatLng(dangerLoc);
       }
       resetSim();
+
+      // Automatically close sidebar if they changed it on mobile
+      if(window.innerWidth < 1024) toggleSidebar();
     }
 
     // --- SIMULATIONS ---
@@ -581,18 +645,18 @@
         gaugePath.style.stroke = '#10b981';
         riskLabel.className = "mt-2 text-[10px] font-bold px-2 py-1 rounded bg-slate-700 text-emerald-400 z-10";
         riskLabel.innerText = "SAFE ZONE";
-        statusText.innerText = "System Nominal";
-        statusCont.className = "flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200";
-        statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
+        statusText.innerText = "Nominal";
+        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-emerald-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-200";
+        statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500";
         statusDot.previousElementSibling.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
         ticker.classList.add('hidden');
       } else if (risk < 80) {
         gaugePath.style.stroke = '#f59e0b';
         riskLabel.className = "mt-2 text-[10px] font-bold px-2 py-1 rounded bg-amber-900/50 text-amber-400 z-10";
         riskLabel.innerText = "ELEVATED ALERT";
-        statusText.innerText = "Warning Active";
-        statusCont.className = "flex items-center space-x-2 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200";
-        statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-amber-500";
+        statusText.innerText = "Warning";
+        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-amber-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-amber-200";
+        statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-amber-500";
         statusDot.previousElementSibling.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75";
         ticker.classList.remove('hidden');
       } else {
@@ -601,8 +665,8 @@
         riskLabel.innerText = "CRITICAL DANGER";
         statusText.innerText = "EVACUATE";
         statusText.classList.replace('text-emerald-700', 'text-rose-700');
-        statusCont.className = "flex items-center space-x-2 bg-rose-100 px-3 py-1.5 rounded-full border border-rose-300 animate-pulse";
-        statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-rose-600";
+        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-rose-100 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-rose-300 animate-pulse";
+        statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-rose-600";
         statusDot.previousElementSibling.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75";
         document.getElementById('alert-badge').classList.remove('hidden');
         ticker.classList.remove('hidden');
