@@ -2,12 +2,9 @@
 <html lang="en">
 
 <head>
-  <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0f172a">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FloodSense Pro | Civilian Safety & Analytics</title>
+  <title>FloodSense Pro | Live Civilian Safety System</title>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -39,22 +36,44 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body { background-color: #f1f5f9; color: #334e68; }
-    .card { background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-    .chart-container { position: relative; height: 220px; width: 100%; }
-    #map { height: 100%; min-height: 450px; border-radius: 0.5rem; z-index: 10; }
+    body { background-color: #f8fafc; color: #334e68; }
     
-    /* Scrollbars */
+    /* Premium Glassmorphism Card Style */
+    .card { 
+      background: rgba(255, 255, 255, 0.65); 
+      backdrop-filter: blur(16px); 
+      -webkit-backdrop-filter: blur(16px); 
+      border: 1px solid rgba(255, 255, 255, 0.8); 
+      border-radius: 1rem; 
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); 
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08); 
+    }
+
+    /* Dark Glassmorphism for specific elements */
+    .card-dark {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .chart-container { position: relative; height: 220px; width: 100%; }
+    #map { height: 100%; min-height: 450px; border-radius: 0.75rem; z-index: 10; border: 1px solid rgba(255,255,255,0.5); }
+    
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    ::-webkit-scrollbar-thumb { background: rgba(203, 213, 225, 0.8); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.8); }
 
-    /* Animations */
     .gauge-path { transition: stroke-dasharray 0.5s ease-out, stroke 0.5s ease; }
     .evac-route { stroke-dasharray: 10, 10; animation: dash 1.5s linear infinite; }
     @keyframes dash { to { stroke-dashoffset: -20; } }
-    
     html { scroll-behavior: smooth; }
   </style>
 </head>
@@ -62,17 +81,17 @@
 <body class="antialiased min-h-screen flex overflow-hidden">
 
   <!-- EMERGENCY EVACUATION MODAL -->
-  <div id="evac-modal" class="hidden fixed inset-0 z-[100] bg-rose-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-white text-center">
+  <div id="evac-modal" class="hidden fixed inset-0 z-[100] bg-rose-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-4 sm:p-6 text-white text-center">
     <div class="animate-bounce mb-6">
       <i data-lucide="triangle-alert" class="w-16 h-16 sm:w-24 sm:h-24 text-rose-400"></i>
     </div>
     <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 uppercase tracking-widest text-rose-100 drop-shadow-lg">EVACUATE NOW</h1>
     <p class="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-10 max-w-3xl text-rose-200 font-light px-2">
-      Critical flood conditions detected in your immediate vicinity. An automated evacuation route to the nearest safe zone has been generated.
+      Critical flood conditions detected. An automated actual road evacuation route to the nearest safe zone has been generated.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto px-4 sm:px-0">
-      <button onclick="dismissEvacuation()" class="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-rose-900 font-bold rounded-xl hover:bg-rose-100 transition shadow-2xl text-base sm:text-lg flex justify-center items-center">
-        <i data-lucide="map-pinned" class="w-5 h-5 sm:w-6 sm:h-6 mr-3"></i> View Safe Route
+      <button onclick="dismissEvacuation()" class="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-rose-900 font-bold rounded-xl hover:bg-rose-100 transition shadow-[0_0_40px_rgba(255,255,255,0.3)] text-base sm:text-lg flex justify-center items-center">
+        <i data-lucide="map-pinned" class="w-5 h-5 sm:w-6 sm:h-6 mr-3"></i> View Live Safe Route
       </button>
       <button class="w-full sm:w-auto px-6 sm:px-8 py-4 bg-transparent border-2 border-rose-400 text-white font-bold rounded-xl hover:bg-rose-800 transition shadow-2xl text-base sm:text-lg flex justify-center items-center">
         <i data-lucide="phone-call" class="w-5 h-5 sm:w-6 sm:h-6 mr-3"></i> Dial Emergency (112)
@@ -80,17 +99,18 @@
     </div>
   </div>
 
-  <!-- Mobile Overlay -->
   <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/60 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0" onclick="toggleSidebar()"></div>
 
   <!-- SIDEBAR NAVIGATION -->
-  <aside id="sidebar" class="w-64 bg-slate-900 text-slate-300 flex flex-col h-screen fixed left-0 top-0 z-50 shadow-xl transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+  <aside id="sidebar" class="w-64 bg-slate-900/95 backdrop-blur-xl text-slate-300 flex flex-col h-screen fixed left-0 top-0 z-50 shadow-2xl transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out border-r border-white/10">
     <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="p-2 bg-blue-500/20 rounded-lg"><i data-lucide="waves" class="w-6 h-6 text-blue-400"></i></div>
+        <div class="p-2 bg-blue-500/20 rounded-lg border border-blue-500/30"><i data-lucide="waves" class="w-6 h-6 text-blue-400"></i></div>
         <div>
-          <h1 class="text-lg font-bold text-white tracking-tight">FloodSense <span class="text-blue-400">Pro</span></h1>
-          <p class="text-[10px] uppercase tracking-widest text-slate-400">Civilian Safety</p>
+          <h1 class="text-lg font-bold text-white tracking-tight">FloodSense <span class="text-blue-400">Live</span></h1>
+          <p class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold flex items-center mt-1">
+            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1 animate-pulse shadow-[0_0_8px_#10b981]"></span> Firebase Sync
+          </p>
         </div>
       </div>
       <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white transition">
@@ -98,10 +118,9 @@
       </button>
     </div>
 
-    <!-- Mobile Context Selector (Inside Sidebar to save space on mobile header) -->
     <div class="lg:hidden px-4 py-4 border-b border-slate-700/50 bg-slate-800/30">
       <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 block">Monitoring Target</label>
-      <div class="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-700 w-full transition-colors">
+      <div class="flex items-center bg-slate-950/50 rounded-lg p-1 border border-slate-700 w-full transition-colors">
         <i data-lucide="target" class="w-4 h-4 text-blue-400 ml-2"></i>
         <select id="monitoring-context-mobile" onchange="changeContext(this.value)" class="bg-transparent text-sm text-slate-200 font-medium border-none focus:ring-0 cursor-pointer py-1.5 px-2 outline-none w-full">
           <option value="river">Ganges River Basin</option>
@@ -112,59 +131,61 @@
     </div>
 
     <nav class="flex-1 overflow-y-auto py-6 space-y-1 px-3">
-      <a href="#overview" class="flex items-center space-x-3 px-4 py-3 bg-blue-600/10 text-blue-400 rounded-lg font-medium transition-colors">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> <span>Dashboard Overview</span>
+      <a href="#overview" class="flex items-center space-x-3 px-4 py-3 bg-blue-600/20 border border-blue-500/20 text-blue-400 rounded-lg font-bold transition-colors">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> <span>Live Dashboard</span>
       </a>
-      <a href="#evacuation" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 rounded-lg font-medium transition-colors group">
-        <i data-lucide="map" class="w-5 h-5 text-slate-400 group-hover:text-white"></i> <span class="group-hover:text-white">Map & Evacuation</span>
+      <a href="#evacuation" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800/50 rounded-lg font-medium transition-colors group">
+        <i data-lucide="map" class="w-5 h-5 text-slate-400 group-hover:text-white"></i> <span class="group-hover:text-white">Route Generator</span>
       </a>
-      <a href="#safety" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 rounded-lg font-medium transition-colors group">
+      <a href="#safety" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800/50 rounded-lg font-medium transition-colors group">
         <i data-lucide="shield-check" class="w-5 h-5 text-slate-400 group-hover:text-white"></i> <span class="group-hover:text-white">Safety Measures</span>
       </a>
-      <a href="#analytics" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 rounded-lg font-medium transition-colors group">
-        <i data-lucide="bar-chart-2" class="w-5 h-5 text-slate-400 group-hover:text-white"></i> <span class="group-hover:text-white">Detailed Analytics</span>
-      </a>
-      <a href="#simulation" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 rounded-lg font-medium transition-colors group">
-        <i data-lucide="flask-conical" class="w-5 h-5 text-slate-400 group-hover:text-white"></i> <span class="group-hover:text-white">System Testing</span>
+      <a href="#analytics" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800/50 rounded-lg font-medium transition-colors group">
+        <i data-lucide="bar-chart-2" class="w-5 h-5 text-slate-400 group-hover:text-white"></i> <span class="group-hover:text-white">API Analytics</span>
       </a>
     </nav>
 
     <div class="p-4 border-t border-slate-700/50 bg-slate-900/50">
+      <button onclick="requestUserLocation()" class="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3 px-4 rounded-xl transition shadow-[0_4px_15px_rgba(37,99,235,0.3)] mb-4">
+        <i data-lucide="navigation" class="w-4 h-4"></i> <span>Use My Location</span>
+      </button>
       <div class="flex items-center space-x-3">
-        <img src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff" alt="User" class="w-10 h-10 rounded-full border border-slate-600">
+        <img src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff" alt="User" class="w-10 h-10 rounded-full border-2 border-slate-600">
         <div>
-          <p class="text-sm font-medium text-white">Local Resident</p>
-          <p class="text-xs text-slate-400">Patna, Sector 4</p>
+          <p class="text-sm font-medium text-white">Civilian User</p>
+          <p class="text-xs text-slate-400 truncate w-32" id="sidebar-loc-text">Default: Patna</p>
         </div>
       </div>
     </div>
   </aside>
 
   <!-- MAIN CONTENT WRAPPER -->
-  <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 lg:ml-64 w-full">
+  <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative lg:ml-64 w-full">
     
+    <!-- DECORATIVE BACKGROUND BLOBS (For Glassmorphism) -->
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 pointer-events-none"></div>
+    <div class="absolute bottom-[20%] right-[-5%] w-[35rem] h-[35rem] bg-emerald-400 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 pointer-events-none"></div>
+    <div class="absolute top-[40%] left-[30%] w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-[90px] opacity-20 pointer-events-none"></div>
+
     <!-- TOP HEADER -->
-    <header class="bg-white border-b border-slate-200 shadow-sm z-30 flex-shrink-0">
+    <header class="bg-white/70 backdrop-blur-lg border-b border-white/50 shadow-sm z-30 flex-shrink-0 relative">
       <div class="px-4 sm:px-6 py-3 flex justify-between items-center">
         
-        <!-- Left Side: Hamburger & Branding -->
         <div class="flex items-center">
-          <button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+          <button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-600 hover:bg-slate-200/50 rounded-lg transition-colors">
             <i data-lucide="menu" class="w-6 h-6"></i>
           </button>
           
-          <!-- Mobile Branding -->
           <div class="lg:hidden flex items-center mr-2">
             <i data-lucide="waves" class="w-5 h-5 text-blue-600 mr-2"></i>
             <span class="font-bold text-slate-800 text-lg">FloodSense</span>
           </div>
 
-          <!-- Desktop Context Selector -->
           <div class="hidden lg:flex items-center space-x-4">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Monitoring Target:</label>
-            <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 transition-colors hover:bg-slate-200">
-              <i data-lucide="target" class="w-4 h-4 text-slate-500 ml-2"></i>
-              <select id="monitoring-context-desktop" onchange="changeContext(this.value)" class="bg-transparent text-sm text-slate-700 font-bold border-none focus:ring-0 cursor-pointer py-1 px-2 outline-none w-48">
+            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Live Target Zone:</label>
+            <div class="flex items-center bg-white/50 backdrop-blur-sm rounded-lg p-1 border border-slate-200 transition-colors shadow-inner">
+              <i data-lucide="target" class="w-4 h-4 text-blue-500 ml-2"></i>
+              <select id="monitoring-context-desktop" onchange="changeContext(this.value)" class="bg-transparent text-sm text-slate-800 font-bold border-none focus:ring-0 cursor-pointer py-1 px-2 outline-none w-48">
                 <option value="river">Ganges River Basin</option>
                 <option value="dam">Farakka Barrage (Dam)</option>
                 <option value="urban">Patna City Drainage</option>
@@ -173,92 +194,122 @@
           </div>
         </div>
 
-        <!-- Right Side: Status & Tools -->
         <div class="flex items-center space-x-3 sm:space-x-6">
-          <div class="flex items-center space-x-1.5 sm:space-x-2 bg-emerald-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-200" id="status-badge-container">
+          <div class="flex items-center space-x-1.5 sm:space-x-2 bg-emerald-50/80 backdrop-blur-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-200 shadow-sm" id="status-badge-container">
             <span class="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500" id="status-dot"></span>
             </span>
-            <span class="text-[10px] sm:text-sm font-bold text-emerald-700 uppercase tracking-wide" id="user-status-text">Nominal</span>
+            <span class="text-[10px] sm:text-sm font-bold text-emerald-700 uppercase tracking-wide" id="user-status-text">Safe</span>
           </div>
           <div class="hidden md:flex flex-col items-end">
-            <span id="tx-status" class="text-xs font-bold text-blue-600 flex items-center"><i data-lucide="wifi" class="w-3 h-3 mr-1"></i> Live Sync</span>
-            <span id="clock" class="text-[10px] text-slate-400 font-medium tracking-widest">--:--:--</span>
+            <span id="tx-status" class="text-xs font-bold text-blue-600 flex items-center"><i data-lucide="database" class="w-3 h-3 mr-1"></i> Live DB Sync</span>
+            <span id="clock" class="text-[10px] text-slate-500 font-bold tracking-widest">--:--:--</span>
           </div>
-          <button class="relative p-2 text-slate-500 hover:text-blue-600 transition-colors bg-slate-100 hover:bg-blue-50 rounded-full">
-            <i data-lucide="bell" class="w-5 h-5"></i>
-            <span id="alert-badge" class="absolute top-0 right-0 h-2.5 w-2.5 sm:h-3 sm:w-3 hidden bg-rose-500 border-2 border-white rounded-full"></span>
-          </button>
         </div>
       </div>
     </header>
 
     <!-- SCROLLABLE CONTENT -->
-    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 scroll-smooth" id="scroll-area">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 scroll-smooth relative z-10" id="scroll-area">
       <div class="max-w-7xl mx-auto space-y-6 lg:space-y-8">
 
-        <!-- ALERTS TICKER (Only shows on warning) -->
-        <div id="alert-ticker" class="hidden bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div id="alert-ticker" class="hidden bg-rose-50/90 backdrop-blur-md border-l-4 border-rose-500 p-4 rounded-r-xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div class="flex items-start sm:items-center">
-            <i data-lucide="alert-circle" class="w-6 h-6 text-rose-500 mr-3 animate-pulse flex-shrink-0"></i>
+            <i data-lucide="alert-circle" class="w-6 h-6 text-rose-600 mr-3 animate-pulse flex-shrink-0"></i>
             <div>
-              <h3 class="text-rose-800 font-bold text-sm">ACTIVE WEATHER ADVISORY</h3>
-              <p class="text-rose-600 text-xs mt-0.5">Heavy rainfall detected upstream. River levels rising faster than nominal rates. Stay alert.</p>
+              <h3 class="text-rose-900 font-extrabold text-sm tracking-wide">ACTIVE EVACUATION ADVISORY</h3>
+              <p class="text-rose-700 text-xs mt-0.5 font-medium">Critical water levels reported from live telemetry nodes. Stay alert.</p>
             </div>
           </div>
-          <button onclick="forceShowRoute()" class="text-xs font-bold bg-rose-600 text-white px-3 py-1.5 rounded shadow hover:bg-rose-700 transition self-end sm:self-auto whitespace-nowrap">Show Safe Zones</button>
+          <button onclick="forceShowRoute()" class="text-xs font-bold bg-rose-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-rose-700 transition self-end sm:self-auto whitespace-nowrap">Plot Escape Route</button>
         </div>
 
         <!-- SECTION 1: KEY METRICS -->
-        <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-6">
+          
           <!-- Risk Gauge -->
-          <div class="card p-5 flex flex-col justify-center items-center relative overflow-hidden bg-slate-800">
-            <div class="absolute inset-0 opacity-10 pointer-events-none"><i data-lucide="shield-alert" class="w-full h-full text-white"></i></div>
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 z-10">Overall Local Risk</h3>
+          <div class="card-dark p-5 flex flex-col justify-center items-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-5 pointer-events-none"><i data-lucide="shield-alert" class="w-full h-full text-white"></i></div>
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2 z-10 flex items-center"><i data-lucide="radar" class="w-3 h-3 mr-1 text-blue-400"></i> Live Risk Index</h3>
             <div class="relative w-40 h-20 overflow-hidden mt-2 z-10">
-              <svg viewBox="0 0 200 100" class="w-full h-full">
-                <path d="M 10 90 A 80 80 0 0 1 190 90" fill="none" stroke="#334155" stroke-width="15" stroke-linecap="round" />
-                <path id="gauge-val" d="M 10 90 A 80 80 0 0 1 190 90" fill="none" stroke="#10b981" stroke-width="15" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" class="gauge-path" />
+              <svg viewBox="0 0 200 100" class="w-full h-full filter drop-shadow-md">
+                <path d="M 10 90 A 80 80 0 0 1 190 90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="15" stroke-linecap="round" />
+                <path id="gauge-val" d="M 10 90 A 80 80 0 0 1 190 90" fill="none" stroke="#10b981" stroke-width="15" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" class="gauge-path drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
               </svg>
-              <div class="absolute bottom-0 left-0 w-full flex justify-center pb-1"><span id="risk-percent" class="text-3xl font-bold text-white">--%</span></div>
+              <div class="absolute bottom-0 left-0 w-full flex justify-center pb-1"><span id="risk-percent" class="text-3xl font-extrabold text-white">--%</span></div>
             </div>
-            <div id="risk-label" class="mt-2 text-[10px] font-bold px-2 py-1 rounded bg-slate-700 text-emerald-400 z-10">Calculating...</div>
+            <div id="risk-label" class="mt-3 text-[10px] font-extrabold px-3 py-1 rounded-full bg-slate-800/80 text-emerald-400 z-10 border border-slate-600/50 uppercase tracking-wider">Syncing DB...</div>
           </div>
 
-          <!-- Water Level -->
+          <!-- Sensor Target Distance -->
           <div class="card p-5 flex flex-col justify-between">
             <div class="flex justify-between items-start">
-              <p class="text-sm font-semibold text-slate-500">Water Level</p>
-              <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="waves" class="w-5 h-5"></i></div>
+              <div>
+                <p class="text-sm font-bold text-slate-700">Sensor Air Gap</p>
+                <p id="calib-status" class="text-[10px] text-slate-500 font-medium">Initializing...</p>
+              </div>
+              <div class="p-2 bg-blue-100/50 backdrop-blur-sm text-blue-600 rounded-lg shadow-sm border border-blue-200/50"><i data-lucide="waves" class="w-5 h-5"></i></div>
             </div>
-            <div>
-              <h2 class="text-3xl font-extrabold text-slate-800 flex items-baseline"><span id="val-wl">--</span><span class="text-sm font-medium text-slate-500 ml-1">cm</span></h2>
-              <div class="mt-3 w-full bg-slate-100 rounded-full h-2"><div id="bar-wl" class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+            <div class="mt-4">
+              <h2 class="text-3xl font-extrabold text-slate-800 flex items-baseline"><span id="val-wl">--</span><span class="text-sm font-bold text-slate-500 ml-1">cm</span></h2>
+              <div class="mt-3 w-full bg-slate-200/60 rounded-full h-2.5 shadow-inner overflow-hidden">
+                <div id="bar-wl" class="bg-blue-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" style="width: 0%"></div>
+              </div>
             </div>
           </div>
 
           <!-- Soil Saturation -->
           <div class="card p-5 flex flex-col justify-between">
             <div class="flex justify-between items-start">
-              <p class="text-sm font-semibold text-slate-500">Ground Saturation</p>
-              <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="mountain" class="w-5 h-5"></i></div>
+              <div>
+                <p class="text-sm font-bold text-slate-700">Ground Saturation</p>
+                <p class="text-[10px] text-slate-500 font-medium">Synced to Firebase Node</p>
+              </div>
+              <div class="p-2 bg-emerald-100/50 backdrop-blur-sm text-emerald-600 rounded-lg shadow-sm border border-emerald-200/50"><i data-lucide="mountain" class="w-5 h-5"></i></div>
             </div>
-            <div>
-              <h2 class="text-3xl font-extrabold text-slate-800 flex items-baseline"><span id="val-sm">--</span><span class="text-sm font-medium text-slate-500 ml-1">%</span></h2>
-              <div class="mt-3 w-full bg-slate-100 rounded-full h-2"><div id="bar-sm" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+            <div class="mt-4">
+              <h2 class="text-3xl font-extrabold text-slate-800 flex items-baseline"><span id="val-sm">--</span><span class="text-sm font-bold text-slate-500 ml-1">%</span></h2>
+              <div class="mt-3 w-full bg-slate-200/60 rounded-full h-2.5 shadow-inner overflow-hidden">
+                <div id="bar-sm" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" style="width: 0%"></div>
+              </div>
             </div>
           </div>
 
-          <!-- Forecast -->
-          <div class="card p-5 flex flex-col justify-between bg-indigo-50/50 border-indigo-100">
-            <div class="flex justify-between items-start">
-              <p class="text-sm font-semibold text-indigo-800">Forecast Rain (48h)</p>
-              <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><i data-lucide="cloud-rain" class="w-5 h-5"></i></div>
+          <!-- Live Weather (Synced from Firebase normally) -->
+          <div class="card p-5 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -right-6 -top-6 opacity-10 text-amber-500"><i data-lucide="sun" class="w-32 h-32"></i></div>
+            <div class="flex justify-between items-start relative z-10">
+              <div>
+                <p class="text-sm font-bold text-slate-700">Local Climate</p>
+                <p id="climate-source" class="text-[10px] text-slate-500 font-medium">DB Sensor Sync</p>
+              </div>
+              <div class="p-2 bg-amber-100/50 backdrop-blur-sm text-amber-600 rounded-lg shadow-sm border border-amber-200/50"><i data-lucide="thermometer-sun" class="w-5 h-5"></i></div>
             </div>
-            <div>
-              <h2 class="text-3xl font-extrabold text-indigo-900 flex items-baseline"><span id="forecast-rain">--</span><span class="text-sm font-medium text-indigo-600 ml-1">mm</span></h2>
-              <p class="text-xs text-indigo-700 mt-2 font-medium flex items-center"><i data-lucide="cpu" class="w-3 h-3 mr-1"></i> AI Prediction Active</p>
+            <div class="mt-4 relative z-10">
+              <h2 class="text-3xl font-extrabold text-slate-800 flex items-baseline"><span id="val-temp">--</span><span class="text-sm font-bold text-slate-500 ml-1">°C</span></h2>
+              <div class="mt-3 bg-white/50 border border-white/60 p-2 rounded-lg flex items-center shadow-sm">
+                <i data-lucide="droplet" class="w-4 h-4 mr-2 text-blue-500"></i> 
+                <span class="text-xs font-bold text-slate-700">Humidity: <span id="val-hum" class="ml-1 text-blue-700">--</span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real Precipitation & Forecast -->
+          <div class="card p-5 flex flex-col justify-between bg-gradient-to-br from-indigo-50/60 to-purple-50/60 border-indigo-200/50 relative overflow-hidden">
+            <div class="absolute -bottom-4 -left-4 opacity-5 text-indigo-900"><i data-lucide="cloud-rain" class="w-24 h-24"></i></div>
+            <div class="flex justify-between items-start relative z-10">
+              <div>
+                <p class="text-sm font-bold text-indigo-900">Weather Forecast</p>
+                <p class="text-[10px] font-extrabold text-indigo-600 uppercase tracking-wider mt-0.5" id="weather-desc">Fetching API...</p>
+              </div>
+              <div class="p-2 bg-indigo-200/50 backdrop-blur-sm text-indigo-700 rounded-lg shadow-sm border border-indigo-300/50"><i data-lucide="cloud-rain" class="w-5 h-5"></i></div>
+            </div>
+            <div class="mt-4 relative z-10">
+              <h2 class="text-3xl font-extrabold text-indigo-900 flex items-baseline"><span id="forecast-rain">--</span><span class="text-sm font-bold text-indigo-700 ml-1">mm</span></h2>
+              <p class="text-[10px] text-indigo-700 mt-3 font-bold flex items-center bg-indigo-100/50 py-1 px-2 rounded-md w-max border border-indigo-200/50">
+                <i data-lucide="satellite" class="w-3 h-3 mr-1 inline text-indigo-500 animate-pulse"></i> <span id="satellite-status">Fetching Live Data...</span>
+              </p>
             </div>
           </div>
         </section>
@@ -267,24 +318,26 @@
         <section id="evacuation" class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           
           <!-- Evacuation Map -->
-          <div class="card lg:col-span-2 flex flex-col overflow-hidden relative border-slate-200">
-            <div id="map-overlay-warning" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 w-11/12 z-[400] bg-rose-600 text-white p-3 sm:p-4 rounded-xl shadow-2xl border-2 border-rose-400 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+          <div class="card lg:col-span-2 flex flex-col overflow-hidden relative border-slate-200/60 p-1">
+            <div id="map-overlay-warning" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 w-11/12 z-[400] bg-rose-600/95 backdrop-blur-md text-white p-3 sm:p-4 rounded-xl shadow-2xl border border-rose-400 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
               <div class="flex items-center">
-                <i data-lucide="alert-triangle" class="w-6 h-6 sm:w-8 sm:h-8 mr-3 sm:mr-4 animate-pulse flex-shrink-0"></i>
+                <div class="p-2 bg-white/20 rounded-lg mr-3 sm:mr-4 flex-shrink-0 animate-pulse">
+                  <i data-lucide="map" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                </div>
                 <div>
-                  <p class="font-extrabold text-sm sm:text-base tracking-wide">EVACUATION ROUTE ACTIVE</p>
-                  <p class="text-xs sm:text-sm text-rose-100 font-medium mt-0.5 sm:mt-1">Follow the dashed blue path to the designated Relief Camp.</p>
+                  <p class="font-extrabold text-sm sm:text-base tracking-wide drop-shadow-md">LIVE ROAD ROUTE CALCULATED</p>
+                  <p class="text-xs sm:text-sm text-rose-100 font-medium mt-0.5 sm:mt-1">OSRM API generated drivable directions to Safe Zone.</p>
                 </div>
               </div>
-              <button onclick="hideRouteWarning()" class="bg-rose-800 p-1.5 sm:p-2 rounded-lg hover:bg-rose-900 transition self-end sm:self-auto"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+              <button onclick="hideRouteWarning()" class="bg-rose-900/50 p-2 rounded-lg hover:bg-rose-900 transition self-end sm:self-auto border border-rose-500/50"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
             </div>
 
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-white z-10">
-              <h3 class="text-sm font-bold text-slate-700 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-blue-600"></i> Live Hazard & Routing Map</h3>
-              <span id="map-target-label" class="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Zone: River Basin</span>
+            <div class="p-4 border-b border-slate-200/50 flex justify-between items-center bg-white/40 backdrop-blur-md rounded-t-[0.6rem] z-10">
+              <h3 class="text-sm font-extrabold text-slate-800 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-blue-600"></i> Real-time Hazard & Routing Map</h3>
+              <span id="map-target-label" class="text-[10px] font-extrabold uppercase tracking-wider bg-blue-100/80 text-blue-800 px-3 py-1.5 rounded-full border border-blue-200/50 shadow-sm">Zone: River Basin</span>
             </div>
-            <div class="flex-grow w-full relative min-h-[350px] md:min-h-[450px]">
-              <div id="map" class="absolute inset-0"></div>
+            <div class="flex-grow w-full relative min-h-[350px] md:min-h-[450px] rounded-b-[0.6rem] overflow-hidden">
+              <div id="map" class="absolute inset-0 bg-slate-100"></div>
             </div>
           </div>
 
@@ -292,120 +345,114 @@
           <div id="safety" class="flex flex-col gap-4 lg:gap-6">
             
             <!-- Quick Actions -->
-            <div class="card p-5 sm:p-6 border-slate-200 bg-white">
-              <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-2">
-                <i data-lucide="navigation" class="w-4 h-4 mr-2 text-blue-600"></i> Action Center
+            <div class="card p-5 sm:p-6 border-slate-200/60">
+              <h3 class="text-sm font-extrabold text-slate-800 mb-4 flex items-center border-b border-slate-200/60 pb-2">
+                <i data-lucide="navigation" class="w-5 h-5 mr-2 text-blue-600"></i> Action Center
               </h3>
-              <button onclick="forceShowRoute()" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex justify-center items-center shadow-md mb-4 group">
-                <i data-lucide="map" class="w-5 h-5 mr-2 group-hover:animate-bounce"></i> Plot Safe Route
+              <button onclick="forceShowRoute()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold transition flex justify-center items-center shadow-[0_4px_20px_rgba(37,99,235,0.4)] mb-5 group">
+                <i data-lucide="route" class="w-5 h-5 mr-2 group-hover:animate-bounce"></i> Request Evacuation Route
               </button>
               
-              <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <h4 class="text-xs text-slate-500 uppercase font-bold mb-2">Target Relief Camp</h4>
-                <p class="text-sm font-bold text-slate-800 flex items-center">
-                  <i data-lucide="tent" class="w-5 h-5 mr-2 text-emerald-600"></i> Patna High School
+              <div class="bg-slate-100/50 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 shadow-inner">
+                <h4 class="text-[10px] text-slate-500 uppercase font-extrabold tracking-wider mb-2">Target Relief Camp</h4>
+                <p class="text-sm font-bold text-slate-800 flex items-center" id="safe-zone-name">
+                  <span class="p-1.5 bg-emerald-100 text-emerald-600 rounded-md mr-2 shadow-sm"><i data-lucide="tent" class="w-4 h-4"></i></span> Patna High School
                 </p>
-                <p class="text-xs text-slate-500 ml-7 mt-1">Capacity: 500 | Dist: 1.2km</p>
+                <p class="text-xs text-slate-500 ml-9 mt-1.5 font-medium">Status: Active | Capacity: Open</p>
               </div>
             </div>
 
             <!-- Emergency Contacts -->
-            <div class="card p-5 sm:p-6 border-slate-200 bg-rose-50 border-rose-100">
-               <h3 class="text-sm font-bold text-rose-800 mb-4 flex items-center border-b border-rose-200 pb-2">
-                <i data-lucide="phone" class="w-4 h-4 mr-2"></i> Emergency Contacts
+            <div class="card p-5 sm:p-6 border-rose-200/50 bg-gradient-to-br from-rose-50/60 to-orange-50/60">
+               <h3 class="text-sm font-extrabold text-rose-900 mb-4 flex items-center border-b border-rose-200/60 pb-2">
+                <i data-lucide="phone" class="w-5 h-5 mr-2 text-rose-500"></i> Emergency Contacts
               </h3>
               <div class="space-y-3">
-                <a href="tel:112" class="flex items-center justify-between p-3 bg-white rounded-lg border border-rose-100 hover:bg-rose-100 transition shadow-sm">
-                  <span class="text-sm font-bold text-slate-700">National Emergency</span>
-                  <span class="text-xs font-bold bg-rose-600 text-white px-2 py-1 rounded">112</span>
+                <a href="tel:112" class="flex items-center justify-between p-3 bg-white/70 backdrop-blur-md rounded-xl border border-rose-100 hover:bg-white hover:shadow-md transition">
+                  <span class="text-sm font-bold text-slate-800">National Emergency</span>
+                  <span class="text-xs font-bold bg-rose-600 text-white px-2.5 py-1 rounded-md shadow-sm">112</span>
                 </a>
-                <a href="tel:1078" class="flex items-center justify-between p-3 bg-white rounded-lg border border-rose-100 hover:bg-rose-100 transition shadow-sm">
-                  <span class="text-sm font-bold text-slate-700">NDRF Control Room</span>
-                  <span class="text-xs font-bold bg-rose-600 text-white px-2 py-1 rounded">1078</span>
-                </a>
-                <a href="#" class="flex items-center justify-between p-3 bg-white rounded-lg border border-rose-100 hover:bg-rose-100 transition shadow-sm">
-                  <span class="text-sm font-bold text-slate-700">Local Hospital</span>
-                  <span class="text-xs font-bold bg-slate-600 text-white px-2 py-1 rounded">Call</span>
+                <a href="tel:1078" class="flex items-center justify-between p-3 bg-white/70 backdrop-blur-md rounded-xl border border-rose-100 hover:bg-white hover:shadow-md transition">
+                  <span class="text-sm font-bold text-slate-800">NDRF Control Room</span>
+                  <span class="text-xs font-bold bg-rose-600 text-white px-2.5 py-1 rounded-md shadow-sm">1078</span>
                 </a>
               </div>
             </div>
 
             <!-- Preparedness Checklist -->
-            <div class="card p-5 sm:p-6 border-slate-200 bg-white flex-1">
-              <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-2">
-                <i data-lucide="list-checks" class="w-4 h-4 mr-2 text-amber-500"></i> Preparedness Checklist
+            <div class="card p-5 sm:p-6 border-slate-200/60">
+              <h3 class="text-sm font-extrabold text-slate-800 mb-4 flex items-center border-b border-slate-200/60 pb-2">
+                <i data-lucide="list-checks" class="w-5 h-5 mr-2 text-amber-500"></i> Preparedness Checklist
               </h3>
-              <ul class="space-y-3 text-sm text-slate-600">
-                <li class="flex items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-slate-300 mr-2 mt-0.5 flex-shrink-0"></i> <span>Prepare an emergency "Go-Bag" (water, meds, docs).</span></li>
-                <li class="flex items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-slate-300 mr-2 mt-0.5 flex-shrink-0"></i> <span>Locate main switches for electricity & gas.</span></li>
-                <li class="flex items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-slate-300 mr-2 mt-0.5 flex-shrink-0"></i> <span>Move valuables to upper floors if possible.</span></li>
-                <li class="flex items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-slate-300 mr-2 mt-0.5 flex-shrink-0"></i> <span>Keep phones charged and save emergency numbers.</span></li>
+              <ul class="space-y-3 text-sm text-slate-700 font-medium">
+                <li class="flex items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 mr-2 mt-0.5 flex-shrink-0"></i> <span>Prepare an emergency "Go-Bag" (water, meds, docs).</span></li>
+                <li class="flex items-start"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 mr-2 mt-0.5 flex-shrink-0"></i> <span>Locate main switches for electricity & gas.</span></li>
               </ul>
             </div>
 
           </div>
         </section>
 
-        <!-- SECTION 3: COMPREHENSIVE ANALYTICS (RESTORED GRAPHS) -->
-        <section id="analytics" class="card p-5 sm:p-6 border-slate-200">
-          <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-3">
-            <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center">
+        <!-- SECTION 3: COMPREHENSIVE ANALYTICS -->
+        <section id="analytics" class="card p-5 sm:p-6 border-slate-200/60 mb-2">
+          <div class="flex justify-between items-center mb-6 border-b border-slate-200/60 pb-3">
+            <h3 class="text-sm sm:text-base font-extrabold text-slate-800 flex items-center">
               <i data-lucide="activity" class="w-5 h-5 mr-2 text-blue-600"></i> Detailed Environmental Analytics
             </h3>
-            <span class="hidden sm:inline-block text-xs font-medium bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Real-time Telemetry (Past 60s)</span>
+            <span class="hidden sm:inline-block text-[10px] font-extrabold uppercase tracking-wider bg-slate-200/50 backdrop-blur-md text-slate-600 px-3 py-1.5 rounded-full border border-slate-300/50">Real-time Telemetry</span>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-            <!-- Graph 1: Water Level -->
-            <div>
-              <h4 class="text-xs font-bold text-center text-slate-500 uppercase mb-3">Water Level Surge (cm)</h4>
+            <div class="bg-white/40 p-4 rounded-xl border border-white/60 shadow-sm">
+              <h4 class="text-xs font-bold text-center text-slate-500 uppercase tracking-wider mb-3">Modelled Sensor Distance Drop (cm)</h4>
               <div class="chart-container"><canvas id="chart-wl"></canvas></div>
             </div>
-            <!-- Graph 2: Soil Moisture -->
-            <div>
-              <h4 class="text-xs font-bold text-center text-slate-500 uppercase mb-3">Ground Saturation Trend (%)</h4>
+            <div class="bg-white/40 p-4 rounded-xl border border-white/60 shadow-sm">
+              <h4 class="text-xs font-bold text-center text-slate-500 uppercase tracking-wider mb-3">Ground Saturation Trend (%)</h4>
               <div class="chart-container"><canvas id="chart-sm"></canvas></div>
             </div>
-            <!-- Graph 3: Temp & Humidity -->
-            <div>
-              <h4 class="text-xs font-bold text-center text-slate-500 uppercase mb-3">Climate Fluctuations</h4>
+            <div class="bg-white/40 p-4 rounded-xl border border-white/60 shadow-sm">
+              <h4 class="text-xs font-bold text-center text-slate-500 uppercase tracking-wider mb-3">Live API Climate Data</h4>
               <div class="chart-container"><canvas id="chart-climate"></canvas></div>
             </div>
-            <!-- Graph 4: Rate of Change -->
-            <div>
-              <h4 class="text-xs font-bold text-center text-slate-500 uppercase mb-3">Water Inflow Rate (cm/min)</h4>
+            <div class="bg-white/40 p-4 rounded-xl border border-white/60 shadow-sm">
+              <h4 class="text-xs font-bold text-center text-slate-500 uppercase tracking-wider mb-3">Water Inflow Rate (cm/min)</h4>
               <div class="chart-container"><canvas id="chart-rate"></canvas></div>
             </div>
           </div>
         </section>
 
         <!-- SECTION 4: SIMULATION CONTROLS -->
-        <section id="simulation" class="card p-5 sm:p-6 border-slate-200 bg-slate-800 text-white">
-          <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-3">
+        <section id="simulation" class="card-dark p-5 sm:p-6 mb-8 relative overflow-hidden">
+          <div class="absolute -right-10 -bottom-10 opacity-5"><i data-lucide="server-cog" class="w-64 h-64 text-white"></i></div>
+          <div class="flex justify-between items-center mb-6 border-b border-slate-700/50 pb-3 relative z-10">
             <div>
-              <h3 class="text-sm sm:text-base font-bold text-white flex items-center">
-                <i data-lucide="server-cog" class="w-5 h-5 mr-2 text-blue-400"></i> System Testing & Simulation
+              <h3 class="text-sm sm:text-base font-extrabold text-white flex items-center">
+                <i data-lucide="server-cog" class="w-5 h-5 mr-2 text-blue-400"></i> System Prototyping & Overrides
               </h3>
-              <p class="text-xs text-slate-400 mt-1">Developers: Inject artificial data to verify routing and warning systems.</p>
+              <p class="text-xs text-slate-400 mt-1 font-medium">Developers: Write test values to the Firebase DB or trigger Live GPS Weather overrides.</p>
             </div>
           </div>
           
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <button onclick="simRainfall()" class="py-3 px-4 rounded-xl border border-indigo-500 text-sm font-bold text-white bg-indigo-600/20 hover:bg-indigo-600 transition flex items-center justify-center">
-              <i data-lucide="cloud-rain" class="w-4 h-4 mr-2"></i> Trigger Heavy Rain
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-10">
+            <button onclick="simRainfall()" class="py-3.5 px-4 rounded-xl border border-indigo-500/50 text-sm font-bold text-white bg-indigo-600/20 hover:bg-indigo-600/40 backdrop-blur-md transition flex items-center justify-center shadow-lg">
+              <i data-lucide="cloud-rain" class="w-4 h-4 mr-2"></i> Trigger Drop (1cm)
             </button>
-            <button onclick="simSurge()" class="py-3 px-4 rounded-xl border border-rose-500 text-sm font-bold text-white bg-rose-600/20 hover:bg-rose-600 transition flex items-center justify-center">
-              <i data-lucide="waves" class="w-4 h-4 mr-2"></i> Trigger Flash Flood
+            <button onclick="simSurge()" class="py-3.5 px-4 rounded-xl border border-rose-500/50 text-sm font-bold text-white bg-rose-600/20 hover:bg-rose-600/40 backdrop-blur-md transition flex items-center justify-center shadow-lg">
+              <i data-lucide="waves" class="w-4 h-4 mr-2"></i> Trigger Critical (3cm)
             </button>
-            <button onclick="resetSim()" class="py-3 px-4 rounded-xl border border-slate-500 text-sm font-bold text-white bg-slate-700 hover:bg-slate-600 transition flex items-center justify-center">
-              <i data-lucide="rotate-ccw" class="w-4 h-4 mr-2"></i> Reset to Nominal
+            <button onclick="simFloodAtMyLocation()" class="py-3.5 px-4 rounded-xl border border-emerald-500/50 text-sm font-bold text-white bg-emerald-600/20 hover:bg-emerald-600/40 backdrop-blur-md transition flex items-center justify-center shadow-lg">
+              <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> Live Location Sim
+            </button>
+            <button onclick="resetSim()" class="py-3.5 px-4 rounded-xl border border-slate-500/50 text-sm font-bold text-white bg-slate-700/50 hover:bg-slate-600/70 backdrop-blur-md transition flex items-center justify-center shadow-lg">
+              <i data-lucide="rotate-ccw" class="w-4 h-4 mr-2"></i> Reset & Recalibrate
             </button>
           </div>
         </section>
 
         <!-- FOOTER -->
-        <footer class="text-center py-6 text-xs text-slate-400 mt-4 sm:mt-8">
-          &copy; <script>document.write(new Date().getFullYear())</script> FloodSense Pro System. Advanced Civilian Protection Dashboard.
+        <footer class="text-center py-6 text-xs text-slate-500 mt-4 sm:mt-8 font-medium">
+          &copy; <script>document.write(new Date().getFullYear())</script> FloodSense Pro System. Advanced Civilian Protection Dashboard. <br class="sm:hidden"/> <span class="font-bold text-slate-700">Made by Team ADA</span>
         </footer>
 
       </div>
@@ -419,39 +466,47 @@
 
     lucide.createIcons();
 
-    // Expose functions to window
-    window.simRainfall = simRainfall;
-    window.simSurge = simSurge;
-    window.resetSim = resetSim;
-    window.changeContext = changeContext;
-    window.dismissEvacuation = dismissEvacuation;
-    window.forceShowRoute = forceShowRoute;
-    window.hideRouteWarning = hideRouteWarning;
-    window.toggleSidebar = toggleSidebar;
+    // --- GLOBAL VARIABLES & STATE ---
+    const tickInterval = 3000; 
+    const fetchInterval = 60000; 
+    let lastApiFetchTime = 0;
+    
+    let isSimOverride = false;
+    let isLiveLocationMode = false; // Overrides Temp/Hum fetching from Firebase to Real Live API
+    let evacuationTriggered = false;
 
-    // --- SIDEBAR TOGGLE ---
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('mobile-overlay');
-      if(sidebar.classList.contains('-translate-x-full')) {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('opacity-0');
-        setTimeout(() => overlay.classList.add('hidden'), 300);
-      }
-    }
+    // Database cached values
+    let fbTemp = 0.0, fbHum = 0.0, fbWl = 150.0, fbSm = 35.0;
 
-    // Close sidebar on mobile link click
-    document.querySelectorAll('#sidebar nav a').forEach(link => {
-      link.addEventListener('click', () => {
-        if(window.innerWidth < 1024) toggleSidebar();
-      });
-    });
+    // Active Display Values
+    let currentWl = 150.0; // Distance from sensor to water (Air gap)
+    let targetWl = 150.0;
+    let currentSm = 35.0; 
+    let liveTemp = 0.0, liveHum = 0.0, livePrecip = 0.0;
+    
+    // Calibration & Distance Logic
+    let isCalibrated = false;
+    let referenceWl = 150.0;
+    let stabilityTimer = 0;
+    let lastCheckWl = 150.0;
+    const SM_CRIT = 85, SM_WARN = 65;
 
-    // --- FIREBASE SETUP ---
+    // Geographic Data
+    let userLoc = [25.5960, 85.1300]; 
+    let dangerLoc = [25.5941, 85.1376]; 
+    let safeZones = [
+      { lat: 25.6020, lng: 85.1200, name: "Patna High School Relief Camp" },
+      { lat: 24.8150, lng: 87.9300, name: "Farakka Evacuation Center" }
+    ];
+    let activeSafeZone = safeZones[0];
+
+    // Arrays for charts
+    const maxDataPoints = 20;
+    let labels = [], wlData = [], smData = [], tempData = [], humData = [], precipData = [], rateData = [];
+    let charts = {};
+    let map, markerUser, markerDanger, routeLayer;
+
+    // --- FIREBASE INITIALIZATION ---
     const customFirebaseConfig = {
       apiKey: "AIzaSyACdSJQZ14LyedKt-yPjTtV--KNwlf-hHY",
       authDomain: "chemathon-e4705.firebaseapp.com",
@@ -465,34 +520,18 @@
     const db = getFirestore(app);
     const sensorDocRef = doc(db, 'sensors', 'latest');
 
-    // --- GLOBAL VARIABLES ---
-    const maxDataPoints = 30;
-    const tickInterval = 2000;
-
-    // Thresholds
-    let WL_SAFE = 100, WL_WARN = 180, WL_CRIT = 250;
-    let SM_SAFE = 40, SM_WARN = 65, SM_CRIT = 85;
-
-    // State Variables
-    let currentWl = 0.0, currentSm = 0.0, currentTemp = 0.0, currentHum = 0.0;
+    // Expose functions to UI
+    window.changeContext = changeContext;
+    window.dismissEvacuation = dismissEvacuation;
+    window.forceShowRoute = forceShowRoute;
+    window.hideRouteWarning = hideRouteWarning;
+    window.toggleSidebar = toggleSidebar;
+    window.requestUserLocation = requestUserLocation;
     
-    // Arrays for ALL charts
-    let labels = [], wlData = [], smData = [], tempData = [], humData = [], rateData = [], riskData = [];
-    
-    // UI State
-    let evacuationTriggered = false;
-    let map, markerUser, markerDanger, routePolyline;
-    let charts = {};
-    
-    // Locations
-    const userLoc = [25.5960, 85.1300];
-    const dangerLoc = [25.5941, 85.1376];
-    const safeZones = [
-      { lat: 25.6020, lng: 85.1200, name: "Patna High School Relief Camp" },
-      { lat: 25.6100, lng: 85.1450, name: "Gandhi Maidan Safe Zone" }
-    ];
-
-    window.weatherData = { rain: 5, alert: 'Clear' };
+    window.simRainfall = simRainfall;
+    window.simSurge = simSurge;
+    window.resetSim = resetSim;
+    window.simFloodAtMyLocation = simFloodAtMyLocation;
 
     // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', async () => {
@@ -514,25 +553,172 @@
         console.error("Firebase Auth Error:", error);
       }
 
+      // Real-time Listener to Firebase Database
       onSnapshot(sensorDocRef, (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
-          currentWl = data.waterLevel ?? currentWl;
-          currentSm = data.soilMoisture ?? currentSm;
-          currentTemp = data.temperature ?? currentTemp;
-          currentHum = data.humidity ?? currentHum;
+          
+          if (data.waterLevel !== undefined) fbWl = data.waterLevel;
+          if (data.soilMoisture !== undefined) fbSm = data.soilMoisture;
+          if (data.temperature !== undefined) fbTemp = data.temperature;
+          if (data.humidity !== undefined) fbHum = data.humidity;
+
+          // If we are NOT running a local simulation override, update UI actively from FB
+          if (!isSimOverride) {
+            currentWl = fbWl;
+            targetWl = fbWl;
+            currentSm = fbSm;
+            liveTemp = fbTemp;
+            liveHum = fbHum;
+            
+            document.getElementById('val-temp').innerText = liveTemp.toFixed(1);
+            document.getElementById('val-hum').innerText = `${liveHum.toFixed(0)}`;
+          }
+          
+          document.getElementById('tx-status').innerHTML = '<i data-lucide="database" class="w-3 h-3 mr-1"></i> Live DB Sync';
+          document.getElementById('tx-status').className = 'text-xs font-bold text-emerald-600 flex items-center';
         }
       });
 
+      await fetchLiveEnvData(); 
       setInterval(systemTick, tickInterval);
-      resetSim(); // Set initial base state
     });
 
     function initArrays() {
       let now = new Date();
       for (let i = maxDataPoints; i >= 0; i--) {
         labels.push(new Date(now.getTime() - i * tickInterval).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-        wlData.push(null); smData.push(null); tempData.push(null); humData.push(null); rateData.push(null); riskData.push(null);
+        wlData.push(null); smData.push(null); tempData.push(null); humData.push(null); precipData.push(null); rateData.push(null);
+      }
+    }
+
+    function getWeatherDesc(code) {
+      if (code <= 1) return "Clear Sky";
+      if (code <= 3) return "Partly Cloudy";
+      if (code <= 49) return "Fog / Overcast";
+      if (code <= 59) return "Drizzle";
+      if (code <= 69) return "Rain";
+      if (code <= 79) return "Snow";
+      if (code <= 82) return "Heavy Rain Showers";
+      if (code <= 99) return "Thunderstorm";
+      return "Variable";
+    }
+
+    // --- REAL OPEN-METEO API FETCH (Rainfall & Forecast) ---
+    async function fetchLiveEnvData() {
+      // Don't auto-fetch if we are just overriding with fake rain, UNLESS we are in Live Location Mode
+      if(isSimOverride && !isLiveLocationMode) return; 
+
+      try {
+        const lat = isLiveLocationMode ? userLoc[0] : dangerLoc[0];
+        const lon = isLiveLocationMode ? userLoc[1] : dangerLoc[1];
+        
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,weathercode`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data && data.current) {
+          livePrecip = data.current.precipitation;
+          
+          const weatherText = getWeatherDesc(data.current.weathercode);
+          document.getElementById('weather-desc').innerText = weatherText;
+          document.getElementById('forecast-rain').innerText = livePrecip.toFixed(1);
+          
+          if (isLiveLocationMode) {
+             document.getElementById('satellite-status').innerText = `Live GPS API Sync`;
+             document.getElementById('climate-source').innerText = `Open-Meteo Override`;
+             
+             // Override Temp & Hum with Live API data ONLY during Live Location Sim
+             liveTemp = data.current.temperature_2m;
+             liveHum = data.current.relative_humidity_2m;
+             document.getElementById('val-temp').innerText = liveTemp.toFixed(1);
+             document.getElementById('val-hum').innerText = `${liveHum.toFixed(0)}`;
+          } else {
+             document.getElementById('satellite-status').innerText = `Open-Meteo: ${new Date().toLocaleTimeString()}`;
+             document.getElementById('climate-source').innerText = `DB Sensor Sync`;
+             // In normal mode, Temp & Hum stay synced to Firebase (fbTemp, fbHum)
+          }
+          
+          lastApiFetchTime = Date.now();
+        }
+      } catch (e) {
+        console.error("Failed to fetch real weather API", e);
+      }
+    }
+
+    // --- GEOLOCATION (HTML5) ---
+    function requestUserLocation() {
+      if (navigator.geolocation) {
+        document.getElementById('sidebar-loc-text').innerText = "Locating GPS...";
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            userLoc = [position.coords.latitude, position.coords.longitude];
+            document.getElementById('sidebar-loc-text').innerText = "Real-Time GPS Active";
+            
+            markerUser.setLatLng(userLoc);
+            map.setView(userLoc, 13);
+            
+            if (routeLayer) map.removeLayer(routeLayer);
+            alert("Your real location has been mapped. Evacuation routes will now calculate from your current physical position.");
+          },
+          (error) => {
+            document.getElementById('sidebar-loc-text').innerText = "GPS Denied - Defaulting";
+            alert("Could not get location. Ensure GPS is allowed in browser. Defaulting to Patna city center.");
+          }
+        );
+      } else {
+         alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    // --- LIVE LOCATION SIMULATION ---
+    async function simFloodAtMyLocation() {
+      if (navigator.geolocation) {
+        document.getElementById('sidebar-loc-text').innerText = "Locating GPS for Sim...";
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            isLiveLocationMode = true; // Turn ON Override
+            isSimOverride = true; // Suspend normal FB checks
+            
+            userLoc = [position.coords.latitude, position.coords.longitude];
+            document.getElementById('sidebar-loc-text').innerText = "Live Sim Active";
+
+            // Update user marker
+            markerUser.setLatLng(userLoc);
+
+            // Dynamically create a "Height Point / High Ground" safe zone nearby (approx 1.5 - 2km away)
+            const highGroundLat = userLoc[0] + 0.015;
+            const highGroundLng = userLoc[1] + 0.015;
+            activeSafeZone = { lat: highGroundLat, lng: highGroundLng, name: "Nearest High Ground" };
+
+            // Add map marker for this new dynamic height point
+            const safeIcon = L.divIcon({
+              className: 'custom-div-icon',
+              html: `<div style="background-color:#10b981; padding:6px; border-radius:50%; border:2px solid white; box-shadow:0 4px 10px rgba(16,185,129,0.5);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20 10 4"/><path d="m5 20 9-16"/><path d="M3 20h18"/><path d="m12 15-3 5"/><path d="m12 15 3 5"/></svg></div>`,
+              iconSize: [34, 34], iconAnchor: [17, 17]
+            });
+            L.marker([highGroundLat, highGroundLng], { icon: safeIcon }).addTo(map).bindPopup(`<b>Designated Safe Zone</b><br>Nearest High Ground Elevation`);
+
+            // Center map to encompass user and safe zone
+            map.fitBounds([userLoc, [highGroundLat, highGroundLng]], { padding: [50, 50] });
+
+            // Update UI Name in the Action Center
+            document.getElementById('safe-zone-name').innerHTML = `<span class="p-1.5 bg-emerald-100 text-emerald-600 rounded-md mr-2 shadow-sm"><i data-lucide="mountain" class="w-4 h-4"></i></span> Nearest High Ground`;
+            lucide.createIcons();
+            
+            // FETCH REAL WEATHER DATA FOR THIS GPS POINT
+            await fetchLiveEnvData();
+
+            // Trigger the actual flood surge prototype logic
+            let drop = isCalibrated ? (referenceWl - 3) : 147;
+            currentWl = drop; targetWl = drop; currentSm = 95.0;
+          },
+          (error) => {
+            alert("Could not get your live location to simulate. Please enable GPS permissions.");
+          }
+        );
+      } else {
+         alert("Geolocation is not supported by this browser.");
       }
     }
 
@@ -541,103 +727,188 @@
       const ctx = value || document.getElementById('monitoring-context-desktop').value;
       const label = document.getElementById('map-target-label');
       
-      // Sync both dropdowns if changed
       if(document.getElementById('monitoring-context-desktop')) document.getElementById('monitoring-context-desktop').value = ctx;
       if(document.getElementById('monitoring-context-mobile')) document.getElementById('monitoring-context-mobile').value = ctx;
       
       if(ctx === 'river') {
-        WL_CRIT = 250; label.innerText = "Zone: River Basin";
-        map.setView([25.5941, 85.1376], 13);
+        dangerLoc = [25.5941, 85.1376];
+        activeSafeZone = safeZones[0];
+        label.innerText = "Zone: River Basin";
       } else if (ctx === 'dam') {
-        WL_CRIT = 500; label.innerText = "Zone: Dam Reservoir";
-        map.setView([24.8100, 87.9200], 13);
-        dangerLoc[0] = 24.81; dangerLoc[1] = 87.92;
-        markerDanger.setLatLng(dangerLoc);
+        dangerLoc = [24.8100, 87.9200]; 
+        activeSafeZone = safeZones[1];
+        label.innerText = "Zone: Dam Reservoir";
       } else if (ctx === 'urban') {
-        WL_CRIT = 100; label.innerText = "Zone: Urban Drainage";
-        map.setView(userLoc, 15);
-        dangerLoc[0] = 25.5950; dangerLoc[1] = 85.1310;
-        markerDanger.setLatLng(dangerLoc);
+        dangerLoc = [25.5950, 85.1310];
+        activeSafeZone = safeZones[0];
+        label.innerText = "Zone: Urban Drainage";
       }
-      resetSim();
+      
+      document.getElementById('safe-zone-name').innerHTML = `<span class="p-1.5 bg-emerald-100 text-emerald-600 rounded-md mr-2 shadow-sm"><i data-lucide="tent" class="w-4 h-4"></i></span> ${activeSafeZone.name}`;
+      lucide.createIcons();
 
-      // Automatically close sidebar if they changed it on mobile
+      markerDanger.setLatLng(dangerLoc);
+      map.setView(dangerLoc, 12);
+      if(routeLayer) map.removeLayer(routeLayer);
+      
+      resetSim();
       if(window.innerWidth < 1024) toggleSidebar();
     }
 
-    // --- SIMULATIONS ---
+    // --- SIMULATION WRITES ---
     async function simRainfall() {
-      try { await setDoc(sensorDocRef, { waterLevel: WL_CRIT * 0.75, soilMoisture: 75.0, temperature: 26.5, humidity: 88.0, timestamp: Date.now() }, { merge: true }); } catch (e) { }
-      window.weatherData.rain = 45;
-      document.getElementById('forecast-rain').innerText = "45.0";
+      isSimOverride = true;
+      livePrecip = 20.0; 
+      document.getElementById('forecast-rain').innerText = "20.0 (SIM)";
+      document.getElementById('weather-desc').innerText = "Simulated Heavy Rain";
+      document.getElementById('satellite-status').innerText = "SIM Override Active";
+      
+      let drop = isCalibrated ? (referenceWl - 1) : 149; // Force 1cm drop (40% Risk)
+      try { await setDoc(sensorDocRef, { waterLevel: drop, soilMoisture: 75.0, timestamp: Date.now() }, { merge: true }); } catch (e) { }
+      currentWl = drop; targetWl = drop; currentSm = 75.0;
     }
+    
     async function simSurge() {
-      try { await setDoc(sensorDocRef, { waterLevel: WL_CRIT * 1.1, soilMoisture: 95.0, temperature: 25.0, humidity: 92.0, timestamp: Date.now() }, { merge: true }); } catch (e) { }
-      window.weatherData.rain = 80;
+      isSimOverride = true;
+      livePrecip = 50.0;
+      document.getElementById('forecast-rain').innerText = "50.0 (SIM)";
+      document.getElementById('weather-desc').innerText = "Simulated Flash Flood";
+      document.getElementById('satellite-status').innerText = "SIM Override Active";
+      
+      let drop = isCalibrated ? (referenceWl - 3) : 147; // Force 3cm drop (100% Risk)
+      try { await setDoc(sensorDocRef, { waterLevel: drop, soilMoisture: 95.0, timestamp: Date.now() }, { merge: true }); } catch (e) { }
+      currentWl = drop; targetWl = drop; currentSm = 95.0;
     }
+    
+    // --- INSTANT RESET & RECALIBRATE ---
     async function resetSim() {
       evacuationTriggered = false;
-      if (routePolyline) map.removeLayer(routePolyline);
+      isSimOverride = false;
+      isLiveLocationMode = false; // Turn off GPS API override!
+      
+      if (routeLayer) map.removeLayer(routeLayer);
       document.getElementById('evac-modal').classList.add('hidden');
       document.getElementById('map-overlay-warning').classList.add('hidden');
-      document.getElementById('alert-badge').classList.add('hidden');
       document.getElementById('alert-ticker').classList.add('hidden');
       
-      window.weatherData.rain = 5;
-      document.getElementById('forecast-rain').innerText = "5.0";
+      // Reset Calibration Timer
+      isCalibrated = false;
+      stabilityTimer = 0;
       
-      try { await setDoc(sensorDocRef, { waterLevel: WL_SAFE * 0.8, soilMoisture: 35.0, temperature: 28.5, humidity: 60.0, timestamp: Date.now() }, { merge: true }); } catch (e) { }
+      await fetchLiveEnvData(); 
+      
+      // Pull strictly from Firebase cache
+      currentWl = fbWl; targetWl = fbWl; currentSm = fbSm; lastCheckWl = fbWl;
+      liveTemp = fbTemp; 
+      liveHum = fbHum;
+      
+      document.getElementById('val-temp').innerText = liveTemp.toFixed(1);
+      document.getElementById('val-hum').innerText = `${liveHum.toFixed(0)}`;
+      document.getElementById('climate-source').innerText = `DB Sensor Sync`;
+      document.getElementById('satellite-status').innerText = `Open-Meteo: ${new Date().toLocaleTimeString()}`;
+      
+      // Attempt to overwrite Database with baseline normal values to stop actual hardware alarms if testing
+      try { 
+        await setDoc(sensorDocRef, { 
+          waterLevel: 150.0, 
+          soilMoisture: 35.0, 
+          timestamp: Date.now() 
+        }, { merge: true }); 
+      } catch (e) { }
     }
 
-    // --- CORE LOGIC ---
+    // --- CORE LOGIC LOOP ---
     function systemTick() {
-      let nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      labels.shift(); labels.push(nowStr);
-      
-      wlData.shift(); wlData.push(currentWl);
-      smData.shift(); smData.push(currentSm);
-      tempData.shift(); tempData.push(currentTemp);
-      humData.shift(); humData.push(currentHum);
+      if (!isSimOverride && Date.now() - lastApiFetchTime > fetchInterval) {
+        fetchLiveEnvData();
+      }
 
-      let prevWl = wlData[wlData.length - 2] || currentWl;
+      let diff = targetWl - currentWl;
+      currentWl += diff * 0.2; 
+
+      // 30 SECOND CALIBRATION LOGIC
+      let calibText = document.getElementById('calib-status');
+      if (!isCalibrated) {
+        if (Math.abs(currentWl - lastCheckWl) <= 0.5) {
+          stabilityTimer += tickInterval;
+          let timeLeft = Math.ceil((30000 - stabilityTimer) / 1000);
+          calibText.innerHTML = `<span class="text-amber-500 animate-pulse font-bold">⏳ Calibrating (${timeLeft}s)</span>`;
+          
+          if (stabilityTimer >= 30000) {
+            isCalibrated = true;
+            referenceWl = currentWl;
+            calibText.innerHTML = `<span class="text-emerald-600 font-bold">✓ Ref: ${referenceWl.toFixed(1)}cm</span> <span class="text-slate-400 ml-2">Drop: 0.0cm</span>`;
+          }
+        } else {
+          stabilityTimer = 0;
+          lastCheckWl = currentWl;
+          calibText.innerHTML = `<span class="text-amber-500 animate-pulse font-bold">⚠️ Unstable. Retrying...</span>`;
+        }
+      } else {
+        let currentDrop = referenceWl - currentWl;
+        calibText.innerHTML = `<span class="text-emerald-600 font-bold">✓ Ref: ${referenceWl.toFixed(1)}cm</span> <span class="text-rose-600 ml-2 font-bold font-mono">Drop: ${currentDrop.toFixed(1)}cm</span>`;
+      }
+
+      let prevWl = wlData[wlData.length - 1] || currentWl;
       let ratePerTick = currentWl - prevWl;
       let ratePerMin = ratePerTick * (60 / (tickInterval / 1000));
       rateData.shift(); rateData.push(ratePerMin);
+      
+      let nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      labels.shift(); labels.push(nowStr);
+      wlData.shift(); wlData.push(currentWl);
+      smData.shift(); smData.push(currentSm);
+      tempData.shift(); tempData.push(liveTemp);
+      humData.shift(); humData.push(liveHum);
+      precipData.shift(); precipData.push(livePrecip);
 
-      let wlRisk = Math.min((currentWl / WL_CRIT) * 100, 100);
-      let smRisk = Math.min((currentSm / SM_CRIT) * 100, 100);
-      let rainRisk = Math.min((window.weatherData.rain / 50) * 100, 100);
-
-      let totalRisk = (wlRisk * 0.5) + (smRisk * 0.3) + (rainRisk * 0.2);
+      // RISK CALCULATION BASED ON DISTANCE DROP (Prototype Logic: 1cm = 40%)
+      let drop = isCalibrated ? (referenceWl - currentWl) : 0;
+      
+      // Calculate purely based on drop for the prototype
+      let totalRisk = 0;
+      if (drop > 0) {
+        totalRisk = drop * 40; // 1cm = 40%, 2cm = 80%, 2.5cm = 100%
+      }
+      
       if (totalRisk > 100) totalRisk = 100;
-      riskData.shift(); riskData.push(totalRisk);
+      if (totalRisk < 0) totalRisk = 0;
 
-      updateDOM(totalRisk);
+      updateDOM(totalRisk, drop);
       updateCharts();
       
-      if (totalRisk >= 85 && !evacuationTriggered) {
+      if (totalRisk >= 85 && !evacuationTriggered && isCalibrated) {
         triggerEvacuation();
       }
     }
 
     // --- UI UPDATER ---
-    function updateDOM(risk) {
+    function updateDOM(risk, drop) {
       document.getElementById('val-wl').innerText = currentWl.toFixed(1);
       document.getElementById('val-sm').innerText = currentSm.toFixed(1);
 
-      document.getElementById('bar-wl').style.width = `${Math.min((currentWl/WL_CRIT)*100, 100)}%`;
-      document.getElementById('bar-sm').style.width = `${Math.min((currentSm/SM_CRIT)*100, 100)}%`;
+      // Bar fills up as distance drops (max 2.5cm drop = 100% full)
+      let wlPct = Math.max(0, Math.min((drop/2.5)*100, 100));
+      document.getElementById('bar-wl').style.width = `${wlPct}%`;
+      
+      let smPct = Math.min((currentSm/SM_CRIT)*100, 100);
+      document.getElementById('bar-sm').style.width = `${smPct}%`;
       
       let barWl = document.getElementById('bar-wl');
-      if(currentWl >= WL_CRIT) barWl.className = "bg-rose-500 h-2 rounded-full transition-all duration-500";
-      else if(currentWl >= WL_WARN) barWl.className = "bg-amber-500 h-2 rounded-full transition-all duration-500";
-      else barWl.className = "bg-blue-500 h-2 rounded-full transition-all duration-500";
+      if(drop >= 2) barWl.className = "bg-rose-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(225,29,72,0.6)]";
+      else if(drop >= 1) barWl.className = "bg-amber-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]";
+      else barWl.className = "bg-blue-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]";
+
+      let barSm = document.getElementById('bar-sm');
+      if(currentSm >= SM_CRIT) barSm.className = "bg-rose-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(225,29,72,0.6)]";
+      else if(currentSm >= SM_WARN) barSm.className = "bg-amber-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]";
+      else barSm.className = "bg-emerald-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]";
 
       document.getElementById('risk-percent').innerText = `${risk.toFixed(0)}%`;
       let dashOffset = 251.2 - (risk / 100) * 251.2;
-      let gaugePath = document.getElementById('gauge-val');
-      gaugePath.style.strokeDashoffset = dashOffset;
+      document.getElementById('gauge-val').style.strokeDashoffset = dashOffset;
 
+      let gaugePath = document.getElementById('gauge-val');
       let riskLabel = document.getElementById('risk-label');
       let statusText = document.getElementById('user-status-text');
       let statusCont = document.getElementById('status-badge-container');
@@ -646,32 +917,31 @@
       
       if (risk < 40) {
         gaugePath.style.stroke = '#10b981';
-        riskLabel.className = "mt-2 text-[10px] font-bold px-2 py-1 rounded bg-slate-700 text-emerald-400 z-10";
+        riskLabel.className = "mt-3 text-[10px] font-extrabold px-3 py-1 rounded-full bg-slate-800/80 text-emerald-400 z-10 border border-slate-600/50 uppercase tracking-wider";
         riskLabel.innerText = "SAFE ZONE";
         statusText.innerText = "Nominal";
-        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-emerald-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-200";
+        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-emerald-50/80 backdrop-blur-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-200 shadow-sm";
         statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500";
         statusDot.previousElementSibling.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
         ticker.classList.add('hidden');
       } else if (risk < 80) {
         gaugePath.style.stroke = '#f59e0b';
-        riskLabel.className = "mt-2 text-[10px] font-bold px-2 py-1 rounded bg-amber-900/50 text-amber-400 z-10";
+        riskLabel.className = "mt-3 text-[10px] font-extrabold px-3 py-1 rounded-full bg-amber-900/80 text-amber-400 z-10 border border-amber-700/50 uppercase tracking-wider";
         riskLabel.innerText = "ELEVATED ALERT";
         statusText.innerText = "Warning";
-        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-amber-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-amber-200";
+        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-amber-50/80 backdrop-blur-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-amber-200 shadow-sm";
         statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-amber-500";
         statusDot.previousElementSibling.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75";
         ticker.classList.remove('hidden');
       } else {
         gaugePath.style.stroke = '#e11d48';
-        riskLabel.className = "mt-2 text-[10px] font-bold px-2 py-1 rounded bg-rose-900 text-rose-400 z-10 animate-pulse";
+        riskLabel.className = "mt-3 text-[10px] font-extrabold px-3 py-1 rounded-full bg-rose-900/90 text-rose-300 z-10 animate-pulse border border-rose-500/50 uppercase tracking-wider";
         riskLabel.innerText = "CRITICAL DANGER";
         statusText.innerText = "EVACUATE";
         statusText.classList.replace('text-emerald-700', 'text-rose-700');
-        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-rose-100 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-rose-300 animate-pulse";
+        statusCont.className = "flex items-center space-x-1.5 sm:space-x-2 bg-rose-100/90 backdrop-blur-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-rose-300 animate-pulse shadow-[0_0_15px_rgba(225,29,72,0.3)]";
         statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-rose-600";
         statusDot.previousElementSibling.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75";
-        document.getElementById('alert-badge').classList.remove('hidden');
         ticker.classList.remove('hidden');
       }
 
@@ -681,85 +951,96 @@
       }
     }
 
-    // --- EVACUATION & MAP ROUTING ---
+    // --- REAL OSRM ROAD ROUTING ---
     function triggerEvacuation() {
       evacuationTriggered = true;
       document.getElementById('evac-modal').classList.remove('hidden');
-      drawEvacuationRoute();
     }
 
     function dismissEvacuation() {
       document.getElementById('evac-modal').classList.add('hidden');
+      forceShowRoute();
+    }
+
+    function hideRouteWarning() { 
+      document.getElementById('map-overlay-warning').classList.add('hidden'); 
+      if(routeLayer) map.removeLayer(routeLayer);
+    }
+
+    async function forceShowRoute() {
       document.getElementById('map-overlay-warning').classList.remove('hidden');
-      setTimeout(() => { map.invalidateSize(); }, 200);
-      document.getElementById('evacuation').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function hideRouteWarning() { document.getElementById('map-overlay-warning').classList.add('hidden'); }
-
-    function forceShowRoute() {
-      drawEvacuationRoute();
-      document.getElementById('map-overlay-warning').classList.remove('hidden');
       document.getElementById('evacuation').scrollIntoView({ behavior: 'smooth' });
       setTimeout(() => { map.invalidateSize(); }, 200);
+
+      try {
+        const start = userLoc;
+        const end = [activeSafeZone.lat, activeSafeZone.lng];
+        const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (routeLayer) map.removeLayer(routeLayer);
+
+        if(data.routes && data.routes.length > 0) {
+           const geojson = data.routes[0].geometry;
+           routeLayer = L.geoJSON(geojson, {
+             style: { color: '#3b82f6', weight: 6, dashArray: '10, 10', className: 'evac-route' }
+           }).addTo(map);
+           map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+        } else {
+           throw new Error("No route found");
+        }
+      } catch (e) {
+        console.error("OSRM Routing failed, falling back to simple line.", e);
+        if (routeLayer) map.removeLayer(routeLayer);
+        routeLayer = L.polyline([userLoc, [activeSafeZone.lat, activeSafeZone.lng]], {
+          color: '#3b82f6', weight: 6, className: 'evac-route'
+        }).addTo(map);
+        map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+      }
     }
 
-    function drawEvacuationRoute() {
-      if (routePolyline) map.removeLayer(routePolyline);
-      const targetZone = safeZones[0];
-      const latDiff = targetZone.lat - userLoc[0];
-      const lngDiff = targetZone.lng - userLoc[1];
-      
-      const pathPoints = [
-        userLoc,
-        [userLoc[0] + latDiff * 0.2, userLoc[1]],
-        [userLoc[0] + latDiff * 0.2, userLoc[1] + lngDiff * 0.8],
-        [targetZone.lat, targetZone.lng]
-      ];
-
-      routePolyline = L.polyline(pathPoints, {
-        color: '#3b82f6', weight: 6, className: 'evac-route', lineCap: 'round', lineJoin: 'round'
-      }).addTo(map);
-
-      map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
-    }
-
+    // --- MAP INITIALIZATION ---
     function initMap() {
-      map = L.map('map', { zoomControl: false }).setView(userLoc, 14);
+      map = L.map('map', { zoomControl: false }).setView(userLoc, 13);
       L.control.zoom({ position: 'bottomright' }).addTo(map);
       
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { 
-        attribution: '&copy; CARTO', maxZoom: 19 
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors', maxZoom: 19 
       }).addTo(map);
 
       const userIcon = L.divIcon({
         className: 'custom-div-icon',
-        html: `<div style="background-color:#3b82f6; width:16px; height:16px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>`,
+        html: `<div style="background-color:#3b82f6; width:16px; height:16px; border-radius:50%; border:3px solid white; box-shadow:0 0 15px rgba(59,130,246,0.8);"></div>`,
         iconSize: [16, 16], iconAnchor: [8, 8]
       });
-      markerUser = L.marker(userLoc, { icon: userIcon }).addTo(map).bindPopup("<b>Your Location</b><br>Sector 4");
+      markerUser = L.marker(userLoc, { icon: userIcon }).addTo(map).bindPopup("<b>Your GPS Location</b><br>Basis for routing.");
 
       safeZones.forEach(zone => {
         const safeIcon = L.divIcon({
           className: 'custom-div-icon',
-          html: `<div style="background-color:#10b981; padding:6px; border-radius:50%; border:2px solid white; box-shadow:0 4px 6px rgba(0,0,0,0.3);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20 10 4"/><path d="m5 20 9-16"/><path d="M3 20h18"/><path d="m12 15-3 5"/><path d="m12 15 3 5"/></svg></div>`,
+          html: `<div style="background-color:#10b981; padding:6px; border-radius:50%; border:2px solid white; box-shadow:0 4px 10px rgba(16,185,129,0.5);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20 10 4"/><path d="m5 20 9-16"/><path d="M3 20h18"/><path d="m12 15-3 5"/><path d="m12 15 3 5"/></svg></div>`,
           iconSize: [34, 34], iconAnchor: [17, 17]
         });
-        L.marker([zone.lat, zone.lng], { icon: safeIcon }).addTo(map).bindPopup(`<b>Relief Camp</b><br>${zone.name}`);
+        L.marker([zone.lat, zone.lng], { icon: safeIcon }).addTo(map).bindPopup(`<b>Safe Zone</b><br>${zone.name}`);
       });
 
       markerDanger = L.circleMarker(dangerLoc, { 
         radius: 12, fillColor: "#3b82f6", color: "#fff", weight: 2, fillOpacity: 0.6 
-      }).addTo(map).bindPopup("<b>Primary Water Sensor</b><br>Monitoring water surge.");
+      }).addTo(map).bindPopup("<b>Target Hazard Zone</b><br>Live environmental monitoring.");
     }
 
-    // --- CHARTS RESTORATION & SETUP ---
+    // --- CHARTS INITIALIZATION ---
     function initCharts() {
-      const commonOpts = { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, elements: { point: { radius: 0 }, line: { tension: 0.4 } }, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#f1f5f9' }, border: { dash: [4, 4] } } } };
+      Chart.defaults.color = '#64748b';
+      Chart.defaults.font.family = 'Inter, sans-serif';
+      
+      const commonOpts = { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, elements: { point: { radius: 0 }, line: { tension: 0.4 } }, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: 'rgba(203, 213, 225, 0.2)' }, border: { dash: [4, 4] } } } };
       
       charts.wl = new Chart(document.getElementById('chart-wl').getContext('2d'), {
         type: 'line', data: { labels: labels, datasets: [{ data: wlData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, borderWidth: 2 }] },
-        options: { ...commonOpts, scales: { y: { suggestedMin: 0, suggestedMax: 300, ...commonOpts.scales.y } } }
+        options: { ...commonOpts, scales: { y: { suggestedMin: 140, suggestedMax: 160, ...commonOpts.scales.y } } }
       });
 
       charts.sm = new Chart(document.getElementById('chart-sm').getContext('2d'), {
@@ -768,12 +1049,12 @@
       });
 
       charts.climate = new Chart(document.getElementById('chart-climate').getContext('2d'), {
-        type: 'line', data: { labels: labels, datasets: [{ label: 'Temp °C', data: tempData, borderColor: '#f59e0b', borderWidth: 2, yAxisID: 'y' }, { label: 'Hum %', data: humData, borderColor: '#6366f1', borderWidth: 2, yAxisID: 'y1' }] },
-        options: { ...commonOpts, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, font: { size: 10 } } } }, scales: { x: { display: false }, y: { type: 'linear', display: true, position: 'left', suggestedMin: 20, suggestedMax: 40 }, y1: { type: 'linear', display: true, position: 'right', suggestedMin: 40, suggestedMax: 100, grid: { drawOnChartArea: false } } } }
+        type: 'line', data: { labels: labels, datasets: [{ label: 'Temp °C', data: tempData, borderColor: '#f59e0b', borderWidth: 2, yAxisID: 'y' }, { label: 'Precip mm', data: precipData, borderColor: '#6366f1', borderWidth: 2, yAxisID: 'y1' }] },
+        options: { ...commonOpts, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, font: { size: 10 } } } }, scales: { x: { display: false }, y: { type: 'linear', display: true, position: 'left', suggestedMin: 10, suggestedMax: 40 }, y1: { type: 'linear', display: true, position: 'right', suggestedMin: 0, suggestedMax: 50, grid: { drawOnChartArea: false } } } }
       });
 
       charts.rate = new Chart(document.getElementById('chart-rate').getContext('2d'), {
-        type: 'bar', data: { labels: labels, datasets: [{ data: rateData, backgroundColor: '#94a3b8' }] }, options: { ...commonOpts }
+        type: 'bar', data: { labels: labels, datasets: [{ data: rateData, backgroundColor: '#94a3b8', borderRadius: 4 }] }, options: { ...commonOpts }
       });
     }
 
@@ -781,48 +1062,28 @@
       charts.wl.update(); 
       charts.sm.update(); 
       charts.climate.update();
-      charts.rate.data.datasets[0].backgroundColor = rateData.map(val => val > 5 ? '#e11d48' : val > 1 ? '#f59e0b' : '#94a3b8');
+      charts.rate.data.datasets[0].backgroundColor = rateData.map(val => Math.abs(val) > 5 ? 'rgba(225, 29, 72, 0.8)' : Math.abs(val) > 1 ? 'rgba(245, 158, 11, 0.8)' : 'rgba(148, 163, 184, 0.6)');
       charts.rate.update();
     }
-  </script>
-  <script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then(reg => console.log("Service Worker registered", reg))
-      .catch(err => console.log("Service Worker failed", err));
-  });
-}
-    let deferredPrompt;
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  document.getElementById("installBtn").style.display = "block";
-});
-
-document.getElementById("installBtn").addEventListener("click", () => {
-  deferredPrompt.prompt();
-});
-if ("Notification" in window) {
-
-  Notification.requestPermission().then(permission => {
-
-    if (permission === "granted") {
-      console.log("Notifications allowed");
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      if(sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
     }
 
-  });
-
-}
-
-</script>
-<button id="installBtn" style="display:none;">
-Install App
-</button>
-
+    document.querySelectorAll('#sidebar nav a').forEach(link => {
+      link.addEventListener('click', () => { if(window.innerWidth < 1024) toggleSidebar(); });
+    });
+  </script>
 </body>
 
 </html>
