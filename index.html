@@ -806,6 +806,17 @@ window.addEventListener("beforeinstallprompt", (e) => {
 document.getElementById("installBtn").addEventListener("click", () => {
   deferredPrompt.prompt();
 });
+if ("Notification" in window) {
+
+  Notification.requestPermission().then(permission => {
+
+    if (permission === "granted") {
+      console.log("Notifications allowed");
+    }
+
+  });
+
+}
 
 </script>
 <button id="installBtn" style="display:none;">
