@@ -10,12 +10,12 @@
     {
       "src": "1.jpeg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg"
     },
     {
       "src": "1.jpeg",
-      "sizes": "512x512",
-      "type": "image/png"
+      "sizes": "192x192",
+      "type": "image/jpeg"
     }
   ]
 }
